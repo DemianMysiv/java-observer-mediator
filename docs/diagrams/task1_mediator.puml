@@ -1,0 +1,102 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+' ================= ІНТЕРФЕЙС ПОСЕРЕДНИКА =================
+interface GroundServiceMediator <<Mediator>> {
+    + notify(sender: GroundService, event: String): void
+}
+
+' ================= БАЗОВИЙ КЛАС СЛУЖБИ =================
+abstract class GroundService <<Colleague>> {
+    # mediator: GroundServiceMediator
+    # serviceName: String
+    # GroundService(mediator: GroundServiceMediator, serviceName: String)
+    + getServiceName(): String
+    # notifyMediator(event: String): void
+    # log(message: String): void
+}
+
+' ================= КОНКРЕТНІ СЛУЖБИ =================
+class CleaningService <<Concrete Colleague>> {
+    + CleaningService(mediator: GroundServiceMediator)
+    + finishCleaning(): void
+}
+
+class CateringService <<Concrete Colleague>> {
+    + CateringService(mediator: GroundServiceMediator)
+    + startCatering(): void
+}
+
+class BaggageService <<Concrete Colleague>> {
+    + BaggageService(mediator: GroundServiceMediator)
+    + finishLoading(): void
+}
+
+class TowingService <<Concrete Colleague>> {
+    + TowingService(mediator: GroundServiceMediator)
+    + allowTowing(): void
+}
+
+class RefuelingService <<Concrete Colleague>> {
+    + RefuelingService(mediator: GroundServiceMediator)
+    + requestRefueling(): void
+    + startRefueling(): void
+    + postponeRefueling(reason: String): void
+}
+
+' ================= КОНКРЕТНИЙ ПОСЕРЕДНИК =================
+class GroundControlCoordinator <<Concrete Mediator>> {
+    - cleaningService: CleaningService
+    - cateringService: CateringService
+    - baggageService: BaggageService
+    - towingService: TowingService
+    - refuelingService: RefuelingService
+    - boardingInProgress: boolean
+    - cleaningCompleted: boolean
+    - baggageLoaded: boolean
+    + setCleaningService(cleaningService: CleaningService): void
+    + setCateringService(cateringService: CateringService): void
+    + setBaggageService(baggageService: BaggageService): void
+    + setTowingService(towingService: TowingService): void
+    + setRefuelingService(refuelingService: RefuelingService): void
+    + setBoardingInProgress(boardingInProgress: boolean): void
+    + notify(sender: GroundService, event: String): void
+    - log(message: String): void
+}
+
+' ================= КЛІЄНТ =================
+class Task1Demo <<Client>> {
+    + {static} run(): void
+}
+
+' ================= ЗВ'ЯЗКИ (Relationships) =================
+
+' Реалізація інтерфейсу посередника
+GroundControlCoordinator ..|> GroundServiceMediator
+
+' Успадкування базового класу служби
+CleaningService --|> GroundService
+CateringService --|> GroundService
+BaggageService --|> GroundService
+TowingService --|> GroundService
+RefuelingService --|> GroundService
+
+' Асоціація: кожна служба знає лише про посередника
+GroundService --> "1" GroundServiceMediator : mediator
+
+' Агрегація: координатор утримує посилання на служби
+GroundControlCoordinator o--> "0..1" CleaningService : cleaningService
+GroundControlCoordinator o--> "0..1" CateringService : cateringService
+GroundControlCoordinator o--> "0..1" BaggageService : baggageService
+GroundControlCoordinator o--> "0..1" TowingService : towingService
+GroundControlCoordinator o--> "0..1" RefuelingService : refuelingService
+
+' Залежності клієнта
+Task1Demo ..> GroundControlCoordinator : створює
+Task1Demo ..> CleaningService : створює
+Task1Demo ..> CateringService : створює
+Task1Demo ..> BaggageService : створює
+Task1Demo ..> TowingService : створює
+Task1Demo ..> RefuelingService : створює
+
+@enduml
