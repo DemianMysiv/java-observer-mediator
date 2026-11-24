@@ -1,0 +1,56 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+interface FlightObserver <<Observer>> {
+    + update(time : String, flightNumber : String, eventDescription : String) : void
+}
+
+class Flight <<ConcreteSubject>> {
+    - flightNumber : String
+    - gate : String
+    - observers : List<FlightObserver>
+    + Flight(flightNumber : String)
+    + addObserver(observer : FlightObserver) : void
+    + removeObserver(observer : FlightObserver) : void
+    - getCurrentTime() : String
+    - notifyObservers(eventDescription : String) : void
+    + delayFlight(newTime : String) : void
+    + changeGate(newGate : String) : void
+    + startBoarding() : void
+}
+
+class InformationBoard <<ConcreteObserver>> {
+    + update(time : String, flightNumber : String, eventDescription : String) : void
+}
+
+class Passenger <<ConcreteObserver>> {
+    - name : String
+    + Passenger(name : String)
+    + update(time : String, flightNumber : String, eventDescription : String) : void
+}
+
+class CateringService <<ConcreteObserver>> {
+    + update(time : String, flightNumber : String, eventDescription : String) : void
+}
+
+class TaxiService <<ConcreteObserver>> {
+    + update(time : String, flightNumber : String, eventDescription : String) : void
+}
+
+class Main <<Client>> {
+    + {static} main(args : String[]) : void
+}
+
+' Зв'язки між класами
+Flight "1" o--> "0..*" FlightObserver : -observers
+InformationBoard ..|> FlightObserver
+Passenger ..|> FlightObserver
+CateringService ..|> FlightObserver
+TaxiService ..|> FlightObserver
+Main ..> Flight : створює та керує
+Main ..> InformationBoard : створює
+Main ..> Passenger : створює
+Main ..> CateringService : створює
+Main ..> TaxiService : створює
+
+@enduml
